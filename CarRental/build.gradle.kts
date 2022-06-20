@@ -1,4 +1,6 @@
-import net.datafaker.Faker
+import com.github.javafaker.Faker
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.util.*
 import kotlin.collections.*
@@ -21,7 +23,6 @@ repositories {
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.springframework.boot:spring-boot-starter-jooq")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.flywaydb:flyway-core")
@@ -35,11 +36,11 @@ buildscript {
 
     repositories {
         mavenCentral()
-        maven(url = "https://s01.oss.sonatype.org/content/repositories/snapshots")
     }
 
     dependencies {
-        classpath("net.datafaker", "datafaker", "1.5.0-SNAPSHOT")
+        classpath("com.github.javafaker", "javafaker", "1.0.2")
+        classpath("com.squareup.okhttp3", "okhttp", "4.10.0")
     }
 }
 
@@ -65,13 +66,18 @@ tasks.register("seedData") {
 
         repeat(100) {
 
+            val request = Request.Builder()
+                .url("https://loremflickr.com/640/480/business")
+                .get()
+                .build()
+
             val faker = Faker(Locale.CANADA)
 
             val companyId = UUID.randomUUID()
             val companyName = faker.company().name()
             val companyPhoneNumber = faker.phoneNumber().phoneNumber()
             val companyDescription = faker.lorem().words(50).joinToString(separator = " ", postfix = ".")
-            val companyImage = faker.avatar().image()
+            val companyImage = OkHttpClient().newCall(request).execute().request.url.toString()
 
 
             val line = arrayListOf<String>(companyId.toString(), companyName, companyPhoneNumber, companyDescription, companyImage)
