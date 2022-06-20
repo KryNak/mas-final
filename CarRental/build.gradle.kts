@@ -79,7 +79,6 @@ tasks.register("seedData") {
             val companyDescription = faker.lorem().words(50).joinToString(separator = " ", postfix = ".")
             val companyImage = OkHttpClient().newCall(request).execute().request.url.toString()
 
-
             val line = arrayListOf<String>(companyId.toString(), companyName, companyPhoneNumber, companyDescription, companyImage)
                 .joinToString(separator = ", ", prefix = "INSERT INTO company VALUES(", postfix = ");") {
                     "'${it.replace("'", "''")}'"
