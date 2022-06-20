@@ -1,11 +1,9 @@
 import {
+    Checkbox,
     Divider,
     IconButton,
     InputBase,
-    List,
-    ListItemButton,
-    ListItemText,
-    Paper,
+    List, Paper,
     Stack
 } from '@mui/material';
 import React from 'react';
