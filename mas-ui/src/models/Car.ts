@@ -3,13 +3,11 @@ export {Car}
 class Car {
 
     vin: string
-    make: string
-    mileage: number
+    name: string
 
-    constructor(vin: string, make: string, mileage: number) {
+    constructor(vin: string, name: string) {
         this.vin = vin
-        this.make = make
-        this.mileage = mileage
+        this.name = name
     }
 
 }

@@ -45,7 +45,7 @@ function CompanyCommercePage(): JSX.Element {
                                 <Typography>{company.name}</Typography>
                             </CardContent>
                         </Card>
-                        <Typography sx={{marginTop: '20px'}}>Pasek udanych tranzakcji</Typography>
+                        <Typography sx={{marginTop: '20px'}}>Pasek udanych transakcji</Typography>
                         <LinearProgress value={20} variant={'determinate'} color={'primary'} sx={{height: '20px', width: '400px'}}/>
                     </Stack>
                     <Stack sx={{marginTop: '20px'}} direction={'row'} justifyContent={'space-between'}>
