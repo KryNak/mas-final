@@ -59,7 +59,7 @@ task<Exec>("startDb") {
     commandLine("./scripts/run-postgres.sh")
 }
 
-tasks.register("seedDb") {
+tasks.register("seedDb__V2") {
 
     doLast {
 
@@ -75,7 +75,7 @@ tasks.register("seedDb") {
                 .get()
                 .build()
 
-            val faker = Faker(Locale.CANADA)
+            val faker = Faker(Locale.ENGLISH)
 
             val companyId = UUID.randomUUID()
             val companyName = faker.company().name()
@@ -96,5 +96,5 @@ tasks.register("seedDb") {
 }
 
 task<Exec>("stopDb") {
-    commandLine("./scripts/stop-postgres.sh")
+    commandLine("./docker-scripts/stop-postgres.sh")
 }

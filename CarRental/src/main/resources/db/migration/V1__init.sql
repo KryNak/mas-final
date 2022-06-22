@@ -5,3 +5,8 @@ CREATE TABLE company(
     description TEXT,
     image TEXT
 );
+
+CREATE TABLE car(
+    vin TEXT,
+    name TEXT
+)
