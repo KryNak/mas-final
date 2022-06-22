@@ -9,7 +9,7 @@ import javax.persistence.Id
 data class Company(
 
     @Id
-    val id: UUID = UUID.randomUUID(),
+    val id: String = UUID.randomUUID().toString(),
 
     val name: String,
 

@@ -1,5 +1,5 @@
 import {Params, useNavigate, useParams} from "react-router-dom";
-import {Company} from "../../mock";
+import {Company} from "../../models/Company";
 import {
     Button,
     IconButton,
@@ -13,15 +13,12 @@ export { CompanyRefusalPage }
 function CompanyRefusalPage(): JSX.Element {
 
     const navigate = useNavigate()
-
     const params: Params = useParams()
-    const company = (JSON.parse(localStorage.getItem("companies") ?? "{[]}") as Company[])
-        .filter((company) => company.id === params.id)[0]
 
     return (
         <Stack height='100%'>
             <Paper variant={"outlined"} sx={{minWidth: '800px', height: 'fit-content', padding: '20px', margin: 'auto'}}>
-                <IconButton onClick={() => {navigate(`/companies/${company.id}`, {replace: true})}} sx={{alignSelf: 'flex-start', marginBottom: '20px'}}><ArrowBack/></IconButton>
+                <IconButton onClick={() => {navigate(`/companies/${params.id}`, {replace: true})}} sx={{alignSelf: 'flex-start', marginBottom: '20px'}}><ArrowBack/></IconButton>
                 <Stack gap={'10px'} direction='column' alignItems={'center'}>
                     <TextField multiline rows={10} fullWidth/>
                 </Stack>

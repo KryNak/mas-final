@@ -55,7 +55,11 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
-tasks.register("seedData") {
+task<Exec>("startDb") {
+    commandLine("./scripts/run-postgres.sh")
+}
+
+tasks.register("seedDb") {
 
     doLast {
 
@@ -89,4 +93,8 @@ tasks.register("seedData") {
 
         file.writeText(text)
     }
+}
+
+task<Exec>("stopDb") {
+    commandLine("./scripts/stop-postgres.sh")
 }

@@ -9,7 +9,7 @@ import {
 import React from 'react';
 import {ArrowBack, SearchOutlined} from "@mui/icons-material";
 import {NavigateFunction, Params, useNavigate, useParams} from "react-router-dom";
-import {Company} from "../../mock";
+import {Company} from "../../models/Company";
 
 export {CarsPage}
 

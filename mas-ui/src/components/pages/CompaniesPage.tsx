@@ -1,32 +1,41 @@
-import {
-    Divider,
-    IconButton,
-    InputBase,
-    List,
-    ListItemButton,
-    ListItemText,
-    Paper,
-    Stack
-} from '@mui/material';
-import React from 'react';
+import {Divider, IconButton, InputBase, List, ListItemButton, ListItemText, Paper, Stack} from '@mui/material';
+import React, {useEffect, useState} from 'react';
 import {SearchOutlined} from "@mui/icons-material";
 import {NavigateFunction, useNavigate} from "react-router-dom";
-import {Company} from "../../mock";
+import {Company} from "../../models/Company";
+import axios from "axios";
 
 function CompaniesPage() {
 
     const navigate: NavigateFunction = useNavigate()
-    let companies: Company[] = JSON.parse(localStorage.getItem("companies") ?? '{[]}') as Company[]
+    const [companies, setCompanies] = useState<Company[]>([])
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const response = await axios.get<Company[]>("http://localhost:8080/api/companies")
+            setCompanies(response.data)
+        }
+
+        fetchData().catch(console.error)
+    }, [])
 
     return (
-        <Stack height={'100%'}>
-            <Paper variant={"outlined"} sx={{minWidth: '800px', height: 'fit-content', padding: '20px', margin: 'auto'}}>
+        <Stack height={'100%'} sx={{padding: '1em 0 1em 0'}}>
+            <Paper variant={"outlined"} sx={{
+                minWidth: '800px',
+                height: 'max-content',
+                minHeight: '200px',
+                padding: '20px',
+                margin: 'auto',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '20px'
+            }}>
                 <Paper sx={{
                     padding: "2px 4px",
                     display: 'flex',
                     alignItems: 'center',
                     width: '100%',
-                    marginBottom: '30px',
                     maxWidth: '800px'
                 }}>
                     <InputBase
@@ -39,8 +48,8 @@ function CompaniesPage() {
                         <SearchOutlined/>
                     </IconButton>
                 </Paper>
-                <Paper variant={"outlined"} sx={{flexShrink: 0, width: '100%', maxWidth: '800px', height: '100%', maxHeight: '1000px'}}>
-                    <List sx={{height: '100%', maxHeight: 'inherit', width: '100%',overflowY: 'scroll'}}>
+                <Paper variant={"outlined"} sx={{flex: '1 1 auto', overflow: 'auto'}} >
+                    <List sx={{height: '100%', width: '100%',overflowY: 'scroll'}}>
                         {companies !== null && companies?.map((company) => (
                             <ListItemButton key={company.id} onClick={() => {navigate(`/companies/${company.id}`)}}>
                                 <ListItemText>
