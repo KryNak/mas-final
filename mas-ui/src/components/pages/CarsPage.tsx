@@ -15,12 +15,12 @@ import axios from "axios";
 
 export {CarsPage}
 
-function intersect(whole: Car[], subset: Car[]): Car[] {
-    return whole.filter((item) => subset.indexOf(item) !== -1)
+function not(a: Car[], b: Car[]) {
+    return a.filter((value) => b.indexOf(value) === -1);
 }
 
-function not(whole: Car[], subset: Car[]): Car[] {
-    return whole.filter((item) => subset.indexOf(item) === -1)
+function intersect(a: Car[], b: Car[]) {
+    return a.filter((value) => b.indexOf(value) !== -1);
 }
 
 function CarsPage() {
@@ -29,11 +29,9 @@ function CarsPage() {
     const params: Params = useParams()
 
     const [cars, setCars] = useState<Car[]>([])
-    const [unselectedCars, setUnselectedCars] = useState<Car[]>([])
-    const [selectedCars, setSelectedCars] = useState<Car[]>([])
-
-    const [leftChecked, setLeftChecked] = useState<Car[]>([])
-    const [rightChecked, setRightChecked] = useState<Car[]>([])
+    const [checked, setChecked] = React.useState<Car[]>([]);
+    const [left, setLeft] = React.useState<Car[]>([]);
+    const [right, setRight] = React.useState<Car[]>([]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -41,23 +39,49 @@ function CarsPage() {
             const data = response.data
 
             setCars(data)
-            setUnselectedCars(data)
+            setLeft(data)
         }
 
         fetchData().catch(console.error)
     }, [])
 
-    function handleTransferToRight() {
+    const leftChecked = intersect(checked, left);
+    const rightChecked = intersect(checked, right);
 
-    }
+    const handleToggle = (value: Car) => () => {
+        const currentIndex = checked.indexOf(value);
+        const newChecked = [...checked];
 
-    function handleTransferLeft() {
+        if (currentIndex === -1) {
+            newChecked.push(value);
+        } else {
+            newChecked.splice(currentIndex, 1);
+        }
 
-    }
+        setChecked(newChecked);
+    };
 
-    function handleCheck(car: Car) {
+    const handleAllRight = () => {
+        setRight(right.concat(left));
+        setLeft([]);
+    };
 
-    }
+    const handleCheckedRight = () => {
+        setRight(right.concat(leftChecked));
+        setLeft(not(left, leftChecked));
+        setChecked(not(checked, leftChecked));
+    };
+
+    const handleCheckedLeft = () => {
+        setLeft(left.concat(rightChecked));
+        setRight(not(right, rightChecked));
+        setChecked(not(checked, rightChecked));
+    };
+
+    const handleAllLeft = () => {
+        setLeft(left.concat(right));
+        setRight([]);
+    };
 
     return (
         <Stack height={'100%'}>
@@ -76,32 +100,18 @@ function CarsPage() {
                 <Divider orientation={"horizontal"} sx={{transform: "translateX(-20px)", marginBottom: '1em', width: 'calc(100% + 40px)'}}/>
 
                 <Stack height={'100%'} flexDirection={'row'} gap={'2em'}>
-                    <Box sx={{flex: '1 0 auto', width: 0, display: 'flex', flexDirection: 'column'}}>
-                        <Paper sx={{
-                            padding: "2px 4px",
-                            display: 'flex',
-                            alignItems: 'center',
-                            width: '100%',
-                            marginBottom: '20px'
-                        }}>
-                            <InputBase
-                                sx={{ml: 1, flex: 1}}
-                                inputProps={{'aria-label': 'search'}}
-                            />
-                        </Paper>
-                        <Paper variant={"outlined"} sx={{flex: '1 1 auto', overflow: 'auto'}}>
-                            <List sx={{height: 0, width: '100%'}}>
-                                {unselectedCars && unselectedCars.map((car) => {
-                                    return (
-                                        <ListItemButton onClick={() => handleCheck(car)} key={car.vin}>
-                                            <ListItemIcon><Checkbox/></ListItemIcon>
-                                            <ListItemText>{car.name}</ListItemText>
-                                        </ListItemButton>
-                                    )
-                                })}
-                            </List>
-                        </Paper>
-                    </Box>
+                    <Paper variant={"outlined"} sx={{flex: '1 0 auto', width: 0}}>
+                        <List sx={{height: 0, width: '100%'}}>
+                            {left && left.map((car) => {
+                                return (
+                                    <ListItemButton onClick={handleToggle(car)} key={car.vin}>
+                                        <ListItemIcon><Checkbox checked={checked.indexOf(car) !== -1} tabIndex={-1} disableRipple/></ListItemIcon>
+                                        <ListItemText>{car.name}</ListItemText>
+                                    </ListItemButton>
+                                )
+                            })}
+                        </List>
+                    </Paper>
 
                     <Stack alignSelf={'center'}>
                         <Button
@@ -109,6 +119,8 @@ function CarsPage() {
                             variant="outlined"
                             size="small"
                             aria-label="move all right"
+                            onClick={handleAllRight}
+                            disabled={left.length === 0}
                         >
                             ≫
                         </Button>
@@ -117,7 +129,8 @@ function CarsPage() {
                             variant="outlined"
                             size="small"
                             aria-label="move selected right"
-                            onClick={handleTransferToRight}
+                            onClick={handleCheckedRight}
+                            disabled={leftChecked.length === 0}
                         >
                             &gt;
                         </Button>
@@ -126,7 +139,8 @@ function CarsPage() {
                             variant="outlined"
                             size="small"
                             aria-label="move selected left"
-                            onClick={handleTransferLeft}
+                            onClick={handleCheckedLeft}
+                            disabled={rightChecked.length === 0}
                         >
                             &lt;
                         </Button>
@@ -135,37 +149,25 @@ function CarsPage() {
                             variant="outlined"
                             size="small"
                             aria-label="move all left"
+                            onClick={handleAllLeft}
+                            disabled={right.length === 0}
                         >
                             ≪
                         </Button>
                     </Stack>
 
-                    <Box sx={{flex: '1 0 auto', display: 'flex', flexDirection: 'column', width: '0'}}>
-                        <Paper sx={{
-                            padding: "2px 4px",
-                            display: 'flex',
-                            alignItems: 'center',
-                            width: '100%',
-                            marginBottom: '20px'
-                        }}>
-                            <InputBase
-                                sx={{ml: 1, flex: 1}}
-                                inputProps={{'aria-label': 'search'}}
-                            />
-                        </Paper>
-                        <Paper variant={"outlined"} sx={{flex: '1 1 auto', overflow: 'auto'}}>
-                            <List sx={{height: 0, width: '100%'}}>
-                                {selectedCars && selectedCars.map((car) => {
-                                    return (
-                                        <ListItemButton key={car.vin}>
-                                            <ListItemIcon><Checkbox/></ListItemIcon>
-                                            <ListItemText>{car.name}</ListItemText>
-                                        </ListItemButton>
-                                    )
-                                })}
-                            </List>
-                        </Paper>
-                    </Box>
+                    <Paper variant={"outlined"} sx={{flex: '1 0 auto', width: 0}}>
+                        <List sx={{height: 0, width: '100%'}}>
+                            {right && right.map((car) => {
+                                return (
+                                    <ListItemButton onClick={handleToggle(car)} key={car.vin}>
+                                        <ListItemIcon><Checkbox/></ListItemIcon>
+                                        <ListItemText>{car.name}</ListItemText>
+                                    </ListItemButton>
+                                )
+                            })}
+                        </List>
+                    </Paper>
                 </Stack>
             </Paper>
 
