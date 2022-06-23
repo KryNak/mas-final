@@ -1,5 +1,4 @@
 import {Params, useNavigate, useParams} from "react-router-dom";
-import {Company} from "../../models/Company";
 import {
     Button,
     IconButton,

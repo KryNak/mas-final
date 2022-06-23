@@ -46,7 +46,7 @@ function CompanyCommercePage(): JSX.Element {
                             </CardContent>
                         </Card>
                         <Typography sx={{marginTop: '20px'}}>Pasek udanych transakcji</Typography>
-                        <LinearProgress value={20} variant={'determinate'} color={'primary'} sx={{height: '20px', width: '400px'}}/>
+                        <LinearProgress value={company.relations} variant={'determinate'} color={'primary'} sx={{height: '20px', width: '400px'}}/>
                     </Stack>
                     <Stack sx={{marginTop: '20px'}} direction={'row'} justifyContent={'space-between'}>
                         <Button onClick={() => { navigate(`/companies/${params.id}/refusal`) }} variant="contained">Odrzuc</Button>

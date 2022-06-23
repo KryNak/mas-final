@@ -41,7 +41,7 @@ function CompanyDetailsPage(): JSX.Element {
                     </Stack>
                     <Stack sx={{marginTop: '20px'}} direction={'row'} justifyContent={'space-between'}>
                         <Button onClick={() => navigate(`/companies/${params.id}/commerce`)} variant="contained">Sprawdz zaleznosc</Button>
-                        <Button onClick={() => navigate(`/companies/${params.id}/cars`)} variant="contained">Zaproponuj samochod</Button>
+                        <Button onClick={() => navigate(`/companies/${params.id}/cars`)} variant="contained">Zaproponuj samochody</Button>
                     </Stack>
                 </Paper>
             }

@@ -100,7 +100,7 @@ function CarsPage() {
                 <Divider orientation={"horizontal"} sx={{transform: "translateX(-20px)", marginBottom: '1em', width: 'calc(100% + 40px)'}}/>
 
                 <Stack height={'100%'} flexDirection={'row'} gap={'2em'}>
-                    <Paper variant={"outlined"} sx={{flex: '1 0 auto', width: 0}}>
+                    <Paper variant={"outlined"} sx={{flex: '1 0 auto', width: 0, overflow: 'auto'}}>
                         <List sx={{height: 0, width: '100%'}}>
                             {left && left.map((car) => {
                                 return (
@@ -156,12 +156,12 @@ function CarsPage() {
                         </Button>
                     </Stack>
 
-                    <Paper variant={"outlined"} sx={{flex: '1 0 auto', width: 0}}>
+                    <Paper variant={"outlined"} sx={{flex: '1 0 auto', width: 0, overflow: 'auto'}}>
                         <List sx={{height: 0, width: '100%'}}>
                             {right && right.map((car) => {
                                 return (
                                     <ListItemButton onClick={handleToggle(car)} key={car.vin}>
-                                        <ListItemIcon><Checkbox/></ListItemIcon>
+                                        <ListItemIcon><Checkbox checked={checked.indexOf(car) !== -1} tabIndex={-1} disableRipple /></ListItemIcon>
                                         <ListItemText>{car.name}</ListItemText>
                                     </ListItemButton>
                                 )
