@@ -34,6 +34,10 @@ dependencies {
 
 buildscript {
 
+    plugins {
+        id("org.flywaydb.flyway") version "8.5.13"
+    }
+
     repositories {
         mavenCentral()
     }
@@ -49,6 +53,12 @@ tasks.withType<KotlinCompile> {
         freeCompilerArgs = listOf("-Xjsr305=strict")
         jvmTarget = "11"
     }
+}
+
+flyway {
+    url = "jdbc:postgresql://localhost:5432/postgres"
+    user = "postgres"
+    password = "qwer1234"
 }
 
 tasks.withType<Test> {
@@ -82,11 +92,18 @@ tasks.register("seedDb__V2") {
             val companyPhoneNumber = faker.phoneNumber().phoneNumber()
             val companyDescription = faker.lorem().words(50).joinToString(separator = " ", postfix = ".")
             val companyImage = OkHttpClient().newCall(request).execute().request.url.toString()
+            val companyRelations = (0..100).random()
 
-            val line = arrayListOf<String>(companyId.toString(), companyName, companyPhoneNumber, companyDescription, companyImage)
-                .joinToString(separator = ", ", prefix = "INSERT INTO company VALUES(", postfix = ");") {
-                    "'${it.replace("'", "''")}'"
-                }
+            val line = arrayListOf<String>(
+                companyId.toString(),
+                companyName,
+                companyPhoneNumber,
+                companyDescription,
+                companyImage
+            ).joinToString(separator = ", ", prefix = "INSERT INTO company VALUES(") {
+                "'${it.replace("'", "''")}'"
+            }.plus(", ${companyRelations});")
+
 
             text += "$line\n"
         }
@@ -96,5 +113,5 @@ tasks.register("seedDb__V2") {
 }
 
 task<Exec>("stopDb") {
-    commandLine("./docker-scripts/stop-postgres.sh")
+    commandLine("./scripts/stop-postgres.sh")
 }

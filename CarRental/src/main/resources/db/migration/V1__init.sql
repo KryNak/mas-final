@@ -3,7 +3,8 @@ CREATE TABLE company(
     name TEXT,
     phone_number TEXT,
     description TEXT,
-    image TEXT
+    image TEXT,
+    relations INT
 );
 
 CREATE TABLE car(

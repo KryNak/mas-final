@@ -18,6 +18,8 @@ data class Company(
 
     val description: String,
 
-    val image: String
+    val image: String,
+
+    val relations: Int
 
 )
