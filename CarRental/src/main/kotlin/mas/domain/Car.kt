@@ -1,4 +1,4 @@
-package mas.models
+package mas.domain
 
 import javax.persistence.Entity
 import javax.persistence.Id

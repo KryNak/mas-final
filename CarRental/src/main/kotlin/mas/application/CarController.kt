@@ -1,7 +1,7 @@
-package mas.api
+package mas.application
 
-import mas.models.Car
-import mas.repositories.CarRepository
+import mas.domain.Car
+import mas.infrastructure.CarRepository
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping

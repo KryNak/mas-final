@@ -1,7 +1,7 @@
-package mas.api
+package mas.application
 
-import mas.models.Company
-import mas.repositories.CompanyRepository
+import mas.domain.Company
+import mas.infrastructure.CompanyRepository
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable

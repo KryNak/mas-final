@@ -1,4 +1,4 @@
-package mas.models
+package mas.domain
 
 import java.util.*
 import javax.persistence.Column

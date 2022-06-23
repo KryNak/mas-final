@@ -1,6 +1,6 @@
-package mas.repositories
+package mas.infrastructure
 
-import mas.models.Company
+import mas.domain.Company
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
