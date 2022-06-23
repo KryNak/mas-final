@@ -4,11 +4,18 @@ import {
     Divider,
     IconButton,
     InputBase,
-    List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper,
-    Stack
+    List, ListItem, ListItemButton, ListItemIcon, ListItemText, Modal, Paper,
+    Stack, Switch, TextField
 } from '@mui/material';
 import React, {useEffect, useState} from 'react';
-import {ArrowBack} from "@mui/icons-material";
+import {
+    ArrowBack,
+    Discount,
+    DiscountOutlined,
+    Favorite,
+    FavoriteBorder,
+    FavoriteBorderOutlined
+} from "@mui/icons-material";
 import {NavigateFunction, Params, useNavigate, useParams} from "react-router-dom";
 import {Car} from "../../models/Car";
 import axios from "axios";
@@ -32,6 +39,9 @@ function CarsPage() {
     const [checked, setChecked] = React.useState<Car[]>([]);
     const [left, setLeft] = React.useState<Car[]>([]);
     const [right, setRight] = React.useState<Car[]>([]);
+    const [open, setOpen] = React.useState<boolean>(false);
+
+    const [discount, setDiscount] = useState<boolean>(false)
 
     useEffect(() => {
         const fetchData = async () => {
@@ -83,6 +93,13 @@ function CarsPage() {
         setRight([]);
     };
 
+    const handleOpen = () => {
+        setOpen(true);
+    };
+    const handleClose = () => {
+        setOpen(false);
+    };
+
     return (
         <Stack height={'100%'}>
             <Paper variant={"outlined"} sx={{
@@ -95,7 +112,7 @@ function CarsPage() {
             }}>
                 <Stack flexDirection={"row"} justifyContent={'space-between'}>
                     <IconButton sx={{alignSelf: 'flex-start', transform: 'translateX(-20px)'}} onClick={() => {navigate(`/companies/${params.id}`, {replace: true})}}><ArrowBack/></IconButton>
-                    <Button color={"success"} sx={{transform: 'translateX(20px)'}}>Zaproponuj</Button>
+                    <Button onClick={handleOpen} sx={{transform: 'translateX(20px)'}}>Zaproponuj</Button>
                 </Stack>
                 <Divider orientation={"horizontal"} sx={{transform: "translateX(-20px)", marginBottom: '1em', width: 'calc(100% + 40px)'}}/>
 
@@ -171,7 +188,48 @@ function CarsPage() {
                 </Stack>
             </Paper>
 
+            <div>
+                <Modal
+                    open={open}
+                    onClose={handleClose}
+                    aria-labelledby="parent-modal-title"
+                    aria-describedby="parent-modal-description"
+                >
+                    <Box sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: 400,
+                        bgcolor: 'background.paper',
+                        border: '2px solid theme.primary',
+                        boxShadow: 24,
+                        padding: '2em',
+                        borderRadius: '5px',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        flexDirection: 'column',
+                        gap: '1em'
+                    }}>
+                        <Paper variant={'outlined'} sx={{display: 'flex', flexDirection: 'row'}}>
+                            <Checkbox checked={discount} onChange={() => setDiscount(prev => !prev)} sx={{'& .MuiSvgIcon-root': { fontSize: 26 }}} icon={<DiscountOutlined />} checkedIcon={<Discount />}/>
+                            <Divider orientation={'vertical'} flexItem/>
+                            <InputBase type={'number'} inputProps={{min: 0, max: 100}} sx={{padding: '0 0.5em'}} disabled={!discount} fullWidth />
+                        </Paper>
+                        {
+                            discount ?
+                                (
+                                    <Button>Zapropobuj z rabatem</Button>
+                                ):
+                                (
+                                    <Button>Zaproponuj bez rabatu</Button>
+                                )
+                        }
+                    </Box>
+                </Modal>
+            </div>
         </Stack>
+
     );
 }
 
