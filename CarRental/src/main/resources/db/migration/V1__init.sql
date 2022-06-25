@@ -1,13 +1,23 @@
-CREATE TABLE company(
-    id TEXT,
-    name TEXT,
-    phone_number TEXT,
-    description TEXT,
-    image TEXT,
-    relations INT
-);
-
-CREATE TABLE car(
-    vin TEXT,
-    name TEXT
-)
+-- CREATE TABLE company(
+--     id TEXT PRIMARY KEY,
+--     name TEXT,
+--     phone_number TEXT,
+--     description TEXT,
+--     image TEXT,
+--     relations INT
+-- );
+--
+-- CREATE TABLE car(
+--     vin TEXT PRIMARY KEY,
+--     name TEXT
+-- );
+--
+-- CREATE TABLE event(
+--     id TEXT PRIMARY KEY,
+--     description TEXT
+-- );
+--
+-- CREATE TABLE event_car(
+--     id_event TEXT REFERENCES event(id),
+--     id_car TEXT REFERENCES car(vin)
+-- );

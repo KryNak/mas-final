@@ -1,15 +1,20 @@
 package mas.domain
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import mas.utils.Json
+import org.hibernate.Hibernate
 import java.util.*
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.Id
+import javax.persistence.*
 
-@Entity(name = "company")
-data class Company(
+@Entity
+@Table(name = "companies")
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+class Company(
 
     @Id
-    val id: String = UUID.randomUUID().toString(),
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    val id: Int = 0,
 
     val name: String,
 
@@ -22,4 +27,33 @@ data class Company(
 
     val relations: Int
 
-)
+) {
+
+    @OneToMany(mappedBy = "company", cascade = [CascadeType.PERSIST, CascadeType.PERSIST])
+    @JsonIgnoreProperties("company")
+    private val events: MutableSet<Event> = mutableSetOf()
+
+    fun addEventUnidirectionally(event: Event) {
+        events.add(event)
+    }
+
+    fun addEventBidirectionally(event: Event) {
+        event.addCompanyUnidirectionally(this)
+        events.add(event)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
+        other as Company
+
+        return id != null && id == other.id
+    }
+
+    override fun hashCode(): Int = javaClass.hashCode()
+
+    override fun toString(): String {
+        return Json.stringify(this)
+    }
+
+}

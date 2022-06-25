@@ -1,9 +1,9 @@
 package mas.infrastructure
 
-import mas.domain.Car
+import mas.domain.Reservation
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface CarRepository: JpaRepository<Car, String> {
+interface ReservationRepository:JpaRepository<Reservation, Int> {
 }

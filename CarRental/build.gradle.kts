@@ -25,6 +25,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     implementation("org.flywaydb:flyway-core")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
@@ -58,15 +59,11 @@ tasks.withType<KotlinCompile> {
 flyway {
     url = "jdbc:postgresql://localhost:5432/postgres"
     user = "postgres"
-    password = "qwer1234"
+    password = "admin"
 }
 
 tasks.withType<Test> {
     useJUnitPlatform()
-}
-
-task<Exec>("startDb") {
-    commandLine("./scripts/run-postgres.sh")
 }
 
 tasks.register("seedDb__V2") {
@@ -110,8 +107,4 @@ tasks.register("seedDb__V2") {
 
         file.writeText(text)
     }
-}
-
-task<Exec>("stopDb") {
-    commandLine("./scripts/stop-postgres.sh")
 }
