@@ -1,0 +1,20 @@
+version: '3.8'
+services:
+  db:
+    container_name: car-rental-db
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5432:5432"
+  pgadmin:
+    container_name: car-rental-pgadmin
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: postgres@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8180:80"
