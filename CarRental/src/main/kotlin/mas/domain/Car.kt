@@ -1,8 +1,13 @@
 package mas.domain
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import mas.enum.CarType
+import mas.enum.DriveType
+import mas.enum.OwningStatus
 import mas.enum.RentalStatus
+import mas.exception.IllegalFieldAccessException
 import mas.utils.Json
 import org.hibernate.Hibernate
 import java.math.BigDecimal
@@ -11,35 +16,238 @@ import javax.persistence.*
 @Entity
 @Table(name = "cars")
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
-class Car(
+class Car {
+
+    constructor(
+        vin: String,
+        description: String? = null,
+        make: String,
+        rentalStatus: RentalStatus,
+        mileage: Int = 0,
+        price: BigDecimal,
+        carTypes: Set<CarType>
+    ) {
+        this.vin = vin
+        this.description = description
+        this.make = make
+        this.rentalStatus = rentalStatus
+        this.mileage = mileage
+        this.price = price
+        this.carTypes = carTypes
+        this.owningStatus = OwningStatus.OWN
+        this.instalmentAmount = BigDecimal.ZERO
+    }
+
+    constructor(
+        vin: String,
+        description: String? = null,
+        make: String,
+        rentalStatus: RentalStatus,
+        mileage: Int = 0,
+        price: BigDecimal,
+        carTypes: Set<CarType>,
+        instalmentAmount: BigDecimal
+    ) {
+        this.vin = vin
+        this.description = description
+        this.make = make
+        this.rentalStatus = rentalStatus
+        this.mileage = mileage
+        this.price = price
+        this.carTypes = carTypes
+        this.owningStatus = OwningStatus.LEASING
+        this.instalmentAmount = instalmentAmount
+    }
 
     @Id
-    val vin: String,
+    val vin: String
 
-    val description: String? = null,
+    val description: String?
 
-    val make: String,
+    val make: String
 
     @Enumerated(value = EnumType.STRING)
-    val rentalStatus: RentalStatus,
+    val rentalStatus: RentalStatus
 
-    val mileage: Int = 0,
+    val mileage: Int
 
-    val price: BigDecimal,
+    val price: BigDecimal
 
-    @ManyToMany(mappedBy = "cars", cascade = [CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE], fetch = FetchType.EAGER)
+    @Enumerated(EnumType.STRING)
+    private var owningStatus: OwningStatus
+
+
+    private var instalmentAmount: BigDecimal
+
+    @JsonIgnore
+    fun getInstalmentAmountProp(): BigDecimal {
+        if (owningStatus != OwningStatus.LEASING) {
+            throw IllegalFieldAccessException()
+        }
+
+        return instalmentAmount
+    }
+
+    fun setInstalmentAmountProp(value: BigDecimal)
+    {
+        if (owningStatus != OwningStatus.LEASING) {
+            throw IllegalFieldAccessException()
+        }
+
+        instalmentAmount = value
+    }
+
+    @Enumerated(EnumType.STRING)
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "car_types", joinColumns = [JoinColumn(name = "fk_car", referencedColumnName = "vin")])
+    @Column(name = "car_type")
+    val carTypes: Set<CarType>
+
+    @Column(nullable = true, name = "time_to_100")
+    private var timeTo100: Int? = null
+
+    @JsonIgnore
+    fun getTimeTo100Prop(): Int? {
+        if (!carTypes.contains(CarType.SPORT)) {
+            throw IllegalFieldAccessException()
+        }
+
+        return timeTo100;
+    }
+
+    fun setTimeTo100Prop(value: Int?) {
+        if (!carTypes.contains(CarType.SPORT)) {
+            throw IllegalFieldAccessException()
+        }
+
+        timeTo100 = value
+    }
+
+    @Column(nullable = true)
+    var carBootSize: Int? = null
+
+    @JsonIgnore
+    fun getCarBootSizeProp(): Int? {
+        if (!carTypes.contains(CarType.LUXURY)) {
+            throw IllegalFieldAccessException()
+        }
+
+        return carBootSize;
+    }
+
+    fun setCarBootSizeProp(value: Int?) {
+        if (!carTypes.contains(CarType.LUXURY)) {
+            throw IllegalFieldAccessException()
+        }
+
+        carBootSize = value
+    }
+
+    @Column(nullable = true)
+    var tvNumber: Int? = null
+
+    @JsonIgnore
+    fun getTvNumberProp(): Int? {
+        if (!carTypes.contains(CarType.LUXURY)) {
+            throw IllegalFieldAccessException()
+        }
+
+        return tvNumber;
+    }
+
+    fun setTvNumberProp(value: Int?) {
+        if (!carTypes.contains(CarType.LUXURY)) {
+            throw IllegalFieldAccessException()
+        }
+
+        tvNumber = value
+    }
+
+    @Column(nullable = true)
+    var weight: Int? = null
+
+    @JsonIgnore
+    fun getWeightProp(): Int? {
+        if (!carTypes.contains(CarType.OFF_ROAD)) {
+            throw IllegalFieldAccessException()
+        }
+
+        return weight;
+    }
+
+    fun setWeightProp(value: Int?) {
+        if (!carTypes.contains(CarType.OFF_ROAD)) {
+            throw IllegalFieldAccessException()
+        }
+
+        weight = value
+    }
+
+    @Column(nullable = true)
+    var height: Int? = null
+
+    @JsonIgnore
+    fun getHeightProp(): Int? {
+        if (!carTypes.contains(CarType.OFF_ROAD)) {
+            throw IllegalFieldAccessException()
+        }
+
+        return height;
+    }
+
+    fun setHeightProp(value: Int?) {
+        if (!carTypes.contains(CarType.OFF_ROAD)) {
+            throw IllegalFieldAccessException()
+        }
+
+        height = value
+    }
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = true)
+    var driveType: DriveType? = null
+
+    @JsonIgnore
+    fun getDriveTypeProp(): DriveType? {
+        if (!carTypes.contains(CarType.OFF_ROAD)) {
+            throw IllegalFieldAccessException()
+        }
+
+        return driveType;
+    }
+
+    fun setDriveTypeProp(value: DriveType?) {
+        if (!carTypes.contains(CarType.OFF_ROAD)) {
+            throw IllegalFieldAccessException()
+        }
+
+        driveType = value
+    }
+
+    @ManyToMany(
+        mappedBy = "cars",
+        cascade = [CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE],
+        fetch = FetchType.EAGER
+    )
     @JsonIgnoreProperties("cars")
-    private val events: MutableSet<Event> = mutableSetOf(),
+    private val events: MutableSet<Event> = mutableSetOf()
 
-    @OneToMany(mappedBy = "car", cascade = [CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE], fetch = FetchType.EAGER)
+    @OneToMany(
+        mappedBy = "car",
+        cascade = [CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE],
+        fetch = FetchType.EAGER
+    )
     @JsonIgnoreProperties("car")
-    val repairs: MutableSet<Repair> = mutableSetOf(),
+    private val repairs: MutableSet<Repair> = mutableSetOf()
 
     @ManyToMany(mappedBy = "cars", cascade = [CascadeType.PERSIST, CascadeType.MERGE], fetch = FetchType.EAGER)
     @JsonIgnoreProperties("cars")
-    val reservations: MutableSet<Reservation> = mutableSetOf()
+    private val reservations: MutableSet<Reservation> = mutableSetOf()
 
-) {
+    fun changeOwningStatusToOwn() {
+        this.owningStatus = OwningStatus.OWN
+        this.instalmentAmount = BigDecimal.ZERO
+    }
 
     fun addEventBidirectionally(event: Event) {
         event.addCarUnidirectionally(this)

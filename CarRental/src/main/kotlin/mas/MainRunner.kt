@@ -1,22 +1,22 @@
 package mas
 
 import mas.domain.*
+import mas.enum.CarType
 import mas.enum.EventType
 import mas.enum.RentalStatus
 import mas.infrastructure.CarRepository
-import mas.infrastructure.ReservationRepository
 import org.springframework.boot.CommandLineRunner
 import org.springframework.stereotype.Component
 import java.math.BigDecimal
 import java.time.Duration
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
+import java.util.*
 import kotlin.time.toKotlinDuration
 
 @Component
 class MainRunner(
-    val carRepository: CarRepository,
-    val reservationRepository: ReservationRepository
+    val carRepository: CarRepository
 ): CommandLineRunner {
 
     override fun run(vararg args: String?) {
@@ -33,8 +33,11 @@ class MainRunner(
             vin = "123",
             make = "BMW",
             price = BigDecimal("300000.67"),
-            rentalStatus = RentalStatus.AVAILABLE
+            rentalStatus = RentalStatus.AVAILABLE,
+            carTypes = EnumSet.of(CarType.SPORT),
+            instalmentAmount = BigDecimal("1000")
         )
+
         val event = Event(
             beginDate = LocalDate.now(),
             eventDuration = Duration.of(1, ChronoUnit.DAYS).toKotlinDuration(),
@@ -45,6 +48,7 @@ class MainRunner(
             dateFrom = LocalDate.now(),
             dateTo = LocalDate.now().plusDays(6)
         )
+
 
         car.addReservationBidirectionally(reservation)
         car.addEventBidirectionally(event)
