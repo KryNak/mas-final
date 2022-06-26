@@ -9,22 +9,23 @@ import javax.persistence.*
 @Entity
 @Table(name = "repairs")
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
-class Repair(
+class Repair (
+    damageDescription: String,
+    repairDescription: String,
+    car: Car
+) {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    val id: Int = 0,
+    val id: Int = 0
 
-    val damageDescription: String,
-
-    val repairDescription: String,
+    val damageDescription: String = damageDescription
+    val repairDescription: String = repairDescription
 
     @ManyToOne(cascade = [CascadeType.PERSIST, CascadeType.MERGE])
     @JoinColumn(name = "vin_fk", referencedColumnName = "vin", nullable = false)
     @JsonIgnoreProperties("repairs")
-    val car: Car
-
-) {
+    private val car: Car = car
 
     init {
         car.addRepairUnidirectionally(this)

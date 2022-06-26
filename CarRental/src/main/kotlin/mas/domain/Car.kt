@@ -11,6 +11,7 @@ import mas.exception.IllegalFieldAccessException
 import mas.utils.Json
 import org.hibernate.Hibernate
 import java.math.BigDecimal
+import java.util.*
 import javax.persistence.*
 
 @Entity
@@ -29,7 +30,7 @@ class Car {
     ) {
         this.vin = vin
         this.description = description
-        this.make = make
+        this.name = make
         this.rentalStatus = rentalStatus
         this.mileage = mileage
         this.price = price
@@ -50,7 +51,7 @@ class Car {
     ) {
         this.vin = vin
         this.description = description
-        this.make = make
+        this.name = make
         this.rentalStatus = rentalStatus
         this.mileage = mileage
         this.price = price
@@ -64,7 +65,7 @@ class Car {
 
     val description: String?
 
-    val make: String
+    val name: String
 
     @Enumerated(value = EnumType.STRING)
     val rentalStatus: RentalStatus
@@ -232,23 +233,6 @@ class Car {
     @JsonIgnoreProperties("cars")
     private val events: MutableSet<Event> = mutableSetOf()
 
-    @OneToMany(
-        mappedBy = "car",
-        cascade = [CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE],
-        fetch = FetchType.EAGER
-    )
-    @JsonIgnoreProperties("car")
-    private val repairs: MutableSet<Repair> = mutableSetOf()
-
-    @ManyToMany(mappedBy = "cars", cascade = [CascadeType.PERSIST, CascadeType.MERGE], fetch = FetchType.EAGER)
-    @JsonIgnoreProperties("cars")
-    private val reservations: MutableSet<Reservation> = mutableSetOf()
-
-    fun changeOwningStatusToOwn() {
-        this.owningStatus = OwningStatus.OWN
-        this.instalmentAmount = BigDecimal.ZERO
-    }
-
     fun addEventBidirectionally(event: Event) {
         event.addCarUnidirectionally(this)
         events.add(event)
@@ -258,9 +242,25 @@ class Car {
         events.add(event)
     }
 
+    @OneToMany(
+        mappedBy = "car",
+        cascade = [CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE],
+        fetch = FetchType.EAGER
+    )
+    @JsonIgnoreProperties("car")
+    private val repairs: MutableSet<Repair> = mutableSetOf()
+
     fun addRepairUnidirectionally(repair: Repair) {
         repairs.add(repair)
     }
+
+    fun getRepairsNumber(): Int {
+        return repairs.count()
+    }
+
+    @ManyToMany(mappedBy = "cars", cascade = [CascadeType.PERSIST, CascadeType.MERGE], fetch = FetchType.EAGER)
+    @JsonIgnoreProperties("cars")
+    private val reservations: MutableSet<Reservation> = TreeSet { res1, res2 -> res1.dateFrom.compareTo(res2.dateTo) }
 
     fun addReservationUnidirectionally(reservation: Reservation) {
         reservations.add(reservation)
@@ -269,6 +269,24 @@ class Car {
     fun addReservationBidirectionally(reservation: Reservation) {
         reservation.addCarUnidirectionally(this)
         reservations.add(reservation)
+    }
+
+    @ManyToOne(cascade = [CascadeType.PERSIST, CascadeType.MERGE])
+    @JoinColumn(name = "fk_rental_company", referencedColumnName = "id", nullable = false)
+    private lateinit var rentalCompany: RentalCompany
+
+    fun addRentalCompanyUnidirectionally(rentalCompany: RentalCompany) {
+        this.rentalCompany = rentalCompany
+    }
+
+    fun addRentalCompanyBidirectionally(rentalCompany: RentalCompany) {
+        rentalCompany.addCarUnidirectionally(this)
+        this.rentalCompany = rentalCompany
+    }
+
+    fun changeOwningStatusToOwn() {
+        this.owningStatus = OwningStatus.OWN
+        this.instalmentAmount = BigDecimal.ZERO
     }
 
     override fun equals(other: Any?): Boolean {
@@ -284,5 +302,6 @@ class Car {
     override fun toString(): String {
         return Json.stringify(this)
     }
+
 
 }

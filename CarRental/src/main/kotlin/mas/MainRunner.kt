@@ -22,17 +22,30 @@ class MainRunner(
     override fun run(vararg args: String?) {
         println("Application started...\n")
 
+        val rentalCompany = RentalCompany(
+            3_000_000
+        )
         val company = Company(
-            name = "Google",
+            name = "Daniel & Pep",
             phoneNumber = "777 888 222",
-            description = "Najs firma",
-            image = "https://google.com/image1",
+            description = "It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+            image = "https://www.thestreet.com/.image/ar_16:9%2Cc_fill%2Ccs_srgb%2Cg_faces:center%2Cq_auto:good%2Cw_768/MTY3NTM5MzU5MDg3MjczODcw/business-structure-which-type-is-best-for-your-business.png",
             relations = 80
         )
-        val car = Car(
-            vin = "123",
-            make = "BMW",
-            price = BigDecimal("300000.67"),
+
+        val car1 = Car(
+            vin = "",
+            make = "BMW Model S",
+            price = BigDecimal(325_950),
+            rentalStatus = RentalStatus.AVAILABLE,
+            carTypes = EnumSet.of(CarType.SPORT),
+            instalmentAmount = BigDecimal("1000")
+        )
+
+        val car2 = Car(
+            vin = "",
+            make = "Mercedes Punto",
+            price = BigDecimal(43_000),
             rentalStatus = RentalStatus.AVAILABLE,
             carTypes = EnumSet.of(CarType.SPORT),
             instalmentAmount = BigDecimal("1000")
@@ -49,19 +62,18 @@ class MainRunner(
             dateTo = LocalDate.now().plusDays(6)
         )
 
-
-        car.addReservationBidirectionally(reservation)
-        car.addEventBidirectionally(event)
+        car1.addRentalCompanyBidirectionally(rentalCompany)
+        car1.addReservationBidirectionally(reservation)
+        car1.addEventBidirectionally(event)
         event.addCompanyBidirectionally(company)
 
         Repair(
-            damageDescription = "dent on left side of car",
-            repairDescription = "sth",
-            car = car
+            "some damage",
+            "we have done some rest period",
+            car1
         )
 
-        carRepository.save(car)
-        println(car)
+        carRepository.save(car1)
     }
 
 }

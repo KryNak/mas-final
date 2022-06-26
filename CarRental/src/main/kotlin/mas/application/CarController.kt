@@ -1,6 +1,7 @@
 package mas.application
 
 import mas.domain.Car
+import mas.dto.response.CarResponseDto
 import mas.infrastructure.CarRepository
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
@@ -15,8 +16,8 @@ class CarController(
 ) {
 
     @GetMapping()
-    fun getCars(): ResponseEntity<List<Car>> {
-        return ResponseEntity.ok(carRepository.findAll())
+    fun getCars(): ResponseEntity<List<CarResponseDto>> {
+        return ResponseEntity.ok(carRepository.findAll().map { CarResponseDto(it.vin, it.name, it.getRepairsNumber()) })
     }
 
     @GetMapping(path = ["/{id}"])

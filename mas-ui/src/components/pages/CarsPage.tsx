@@ -5,9 +5,9 @@ import {
     IconButton,
     InputBase,
     List, ListItem, ListItemButton, ListItemIcon, ListItemText, Modal, Paper,
-    Stack, Switch, TextField
+    Stack, Switch, TextField, Tooltip
 } from '@mui/material';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
     ArrowBack,
     Discount,
@@ -19,6 +19,8 @@ import {
 import {NavigateFunction, Params, useNavigate, useParams} from "react-router-dom";
 import {Car} from "../../models/Car";
 import axios from "axios";
+import {Offer} from "../../models/Offer";
+import {useSnackbar} from "notistack";
 
 export {CarsPage}
 
@@ -41,7 +43,10 @@ function CarsPage() {
     const [right, setRight] = React.useState<Car[]>([]);
     const [open, setOpen] = React.useState<boolean>(false);
 
-    const [discount, setDiscount] = useState<boolean>(false)
+    const [discount, setDiscount] = useState<number>(0);
+    const [discountSwitch, setDiscountSwitch] = useState<boolean>(false)
+
+    const { enqueueSnackbar } = useSnackbar();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -94,11 +99,66 @@ function CarsPage() {
     };
 
     const handleOpen = () => {
-        setOpen(true);
+        if(right.length > 0){
+            setOpen(true);
+        }
+        else {
+            enqueueSnackbar("Najpierw musisz wybrac pojazdy", {variant: "warning"})
+        }
     };
     const handleClose = () => {
         setOpen(false);
     };
+
+    const handleDiscountChange = (ev: React.ChangeEvent<HTMLInputElement>) => {
+        const value = Math.max(1, Math.min(100, +ev.target.value));
+        setDiscount(value);
+    }
+
+    const handleSubmitWithoutDiscount = () => {
+
+        const postData = async () => {
+            const offer: Offer = new Offer(
+                (params.id ?? -1) as number,
+                true,
+                0,
+                right,
+                ""
+            )
+
+            await axios.post("http://localhost:8080/api/offers", offer)
+        }
+
+        postData()
+            .finally(() => {
+                handleClose()
+                navigate('/companies', {replace: true})
+                enqueueSnackbar('Pomyslnie wyslano oferte bez rabatu', {variant: 'success'})
+            }).catch(console.error)
+    }
+
+    const handleSubmitWithDiscount = () => {
+
+        const postData = async () => {
+            const offer: Offer = new Offer(
+                (params.id ?? -1) as number,
+                true,
+                discount,
+                right,
+                ""
+            )
+
+            await axios.post("http://localhost:8080/api/offers", offer)
+        }
+
+        postData()
+            .finally(() => {
+                handleClose()
+                navigate('/companies', {replace: true})
+                enqueueSnackbar(`Pomyslnie dodano oferte z rabatem ${discount}%`, {variant: 'success'})
+            })
+            .catch(console.error)
+    }
 
     return (
         <Stack height={'100%'}>
@@ -111,20 +171,27 @@ function CarsPage() {
                 height: 'calc(100vh - 2em)'
             }}>
                 <Stack flexDirection={"row"} justifyContent={'space-between'}>
-                    <IconButton sx={{alignSelf: 'flex-start', transform: 'translateX(-20px)'}} onClick={() => {navigate(`/companies/${params.id}`, {replace: true})}}><ArrowBack/></IconButton>
+                    <IconButton sx={{alignSelf: 'flex-start', transform: 'translateX(-20px)'}} onClick={() => {
+                        navigate(`/companies/${params.id}`, {replace: true})
+                    }}><ArrowBack/></IconButton>
                     <Button onClick={handleOpen} sx={{transform: 'translateX(20px)'}}>Zaproponuj</Button>
                 </Stack>
-                <Divider orientation={"horizontal"} sx={{transform: "translateX(-20px)", marginBottom: '1em', width: 'calc(100% + 40px)'}}/>
+                <Divider orientation={"horizontal"}
+                         sx={{transform: "translateX(-20px)", marginBottom: '1em', width: 'calc(100% + 40px)'}}/>
 
                 <Stack height={'100%'} flexDirection={'row'} gap={'2em'}>
                     <Paper variant={"outlined"} sx={{flex: '1 0 auto', width: 0, overflow: 'auto'}}>
                         <List sx={{height: 0, width: '100%'}}>
                             {left && left.map((car) => {
                                 return (
-                                    <ListItemButton onClick={handleToggle(car)} key={car.vin}>
-                                        <ListItemIcon><Checkbox checked={checked.indexOf(car) !== -1} tabIndex={-1} disableRipple/></ListItemIcon>
-                                        <ListItemText>{car.name}</ListItemText>
-                                    </ListItemButton>
+                                    <Tooltip key={car.vin} title={`Liczba napraw wynosi: ${car.repairAmount}`}
+                                             enterDelay={500}>
+                                        <ListItemButton onClick={handleToggle(car)} key={car.vin}>
+                                            <ListItemIcon><Checkbox checked={checked.indexOf(car) !== -1} tabIndex={-1}
+                                                                    disableRipple/></ListItemIcon>
+                                            <ListItemText>{car.name}</ListItemText>
+                                        </ListItemButton>
+                                    </Tooltip>
                                 )
                             })}
                         </List>
@@ -132,7 +199,7 @@ function CarsPage() {
 
                     <Stack alignSelf={'center'}>
                         <Button
-                            sx={{ my: 0.5 }}
+                            sx={{my: 0.5}}
                             variant="outlined"
                             size="small"
                             aria-label="move all right"
@@ -142,7 +209,7 @@ function CarsPage() {
                             ≫
                         </Button>
                         <Button
-                            sx={{ my: 0.5 }}
+                            sx={{my: 0.5}}
                             variant="outlined"
                             size="small"
                             aria-label="move selected right"
@@ -152,7 +219,7 @@ function CarsPage() {
                             &gt;
                         </Button>
                         <Button
-                            sx={{ my: 0.5 }}
+                            sx={{my: 0.5}}
                             variant="outlined"
                             size="small"
                             aria-label="move selected left"
@@ -162,7 +229,7 @@ function CarsPage() {
                             &lt;
                         </Button>
                         <Button
-                            sx={{ my: 0.5 }}
+                            sx={{my: 0.5}}
                             variant="outlined"
                             size="small"
                             aria-label="move all left"
@@ -177,10 +244,14 @@ function CarsPage() {
                         <List sx={{height: 0, width: '100%'}}>
                             {right && right.map((car) => {
                                 return (
-                                    <ListItemButton onClick={handleToggle(car)} key={car.vin}>
-                                        <ListItemIcon><Checkbox checked={checked.indexOf(car) !== -1} tabIndex={-1} disableRipple /></ListItemIcon>
-                                        <ListItemText>{car.name}</ListItemText>
-                                    </ListItemButton>
+                                    <Tooltip key={car.vin} title={`Liczba napraw wynosi: ${car.repairAmount}`}
+                                             enterDelay={1000}>
+                                        <ListItemButton onClick={handleToggle(car)}>
+                                            <ListItemIcon><Checkbox checked={checked.indexOf(car) !== -1} tabIndex={-1}
+                                                                    disableRipple/></ListItemIcon>
+                                            <ListItemText>{car.name}</ListItemText>
+                                        </ListItemButton>
+                                    </Tooltip>
                                 )
                             })}
                         </List>
@@ -212,17 +283,20 @@ function CarsPage() {
                         gap: '1em'
                     }}>
                         <Paper variant={'outlined'} sx={{display: 'flex', flexDirection: 'row'}}>
-                            <Checkbox checked={discount} onChange={() => setDiscount(prev => !prev)} sx={{'& .MuiSvgIcon-root': { fontSize: 26 }}} icon={<DiscountOutlined />} checkedIcon={<Discount />}/>
+                            <Checkbox checked={discountSwitch} onChange={() => setDiscountSwitch(prev => !prev)}
+                                      sx={{'& .MuiSvgIcon-root': {fontSize: 26}}} icon={<DiscountOutlined/>}
+                                      checkedIcon={<Discount/>}/>
                             <Divider orientation={'vertical'} flexItem/>
-                            <InputBase type={'number'} inputProps={{min: 0, max: 100}} sx={{padding: '0 0.5em'}} disabled={!discount} fullWidth />
+                            <InputBase value={discount} onChange={handleDiscountChange} type={'number'}
+                                       sx={{padding: '0 0.5em'}} disabled={!discountSwitch} fullWidth/>
                         </Paper>
                         {
-                            discount ?
+                            discountSwitch ?
                                 (
-                                    <Button>Zapropobuj z rabatem</Button>
-                                ):
+                                    <Button onClick={handleSubmitWithDiscount}>Zapropobuj z rabatem</Button>
+                                ) :
                                 (
-                                    <Button>Zaproponuj bez rabatu</Button>
+                                    <Button onClick={handleSubmitWithoutDiscount}>Zaproponuj bez rabatu</Button>
                                 )
                         }
                     </Box>

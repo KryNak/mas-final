@@ -5,24 +5,38 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import mas.utils.Json
 import org.hibernate.Hibernate
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 import javax.persistence.*
+import java.time.Duration
+import java.util.concurrent.TimeUnit
 
 @Entity
 @Table(name = "reservations")
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 class Reservation(
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    val id: Int = 0,
-
-    @Column(columnDefinition = "DATE")
-    val dateFrom: LocalDate,
-
-    @Column(columnDefinition = "DATE")
-    val dateTo: LocalDate
+    dateFrom: LocalDate,
+    dateTo: LocalDate
 
 ) {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    val id: Int = 0
+
+    @Column(columnDefinition = "DATE")
+    val dateFrom: LocalDate = dateFrom
+
+    @Column(columnDefinition = "DATE")
+    val dateTo: LocalDate = dateTo
+
+    @Transient
+    var duration: Long = Duration.between(dateFrom.atStartOfDay(), dateTo.atStartOfDay()).toDays()
+
+    @PostLoad()
+    private fun setDuration() {
+        duration = Duration.between(dateFrom.atStartOfDay(), dateTo.atStartOfDay()).toDays()
+    }
 
     @ManyToMany(cascade = [CascadeType.MERGE, CascadeType.PERSIST])
     @JoinTable(

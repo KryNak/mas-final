@@ -20,7 +20,7 @@ class CompanyController(
     }
 
     @GetMapping(path = ["/{id}"])
-    fun getCompany(@PathVariable(name = "id") id: String): ResponseEntity<Company> {
+    fun getCompany(@PathVariable(name = "id") id: Int): ResponseEntity<Company> {
         return ResponseEntity.ok(companyRepository.findById(id).get())
     }
 

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import mas.utils.Json
 import org.hibernate.Hibernate
-import java.util.*
 import javax.persistence.*
 
 @Entity
@@ -40,6 +39,18 @@ class Company(
     fun addEventBidirectionally(event: Event) {
         event.addCompanyUnidirectionally(this)
         events.add(event)
+    }
+
+    @OneToMany(mappedBy = "company", cascade = [CascadeType.PERSIST, CascadeType.MERGE])
+    private val offers: MutableSet<Offer> = mutableSetOf()
+
+    fun addOfferUnidirectionally(offer: Offer) {
+        offers.add(offer)
+    }
+
+    fun addOfferBidirectionally(offer: Offer) {
+        offer.addCompanyUnidirectionally(this)
+        offers.add(offer)
     }
 
     override fun equals(other: Any?): Boolean {
