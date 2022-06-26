@@ -124,7 +124,7 @@ class Car {
     }
 
     @Column(nullable = true)
-    var carBootSize: Int? = null
+    private var carBootSize: Int? = null
 
     @JsonIgnore
     fun getCarBootSizeProp(): Int? {
@@ -144,7 +144,7 @@ class Car {
     }
 
     @Column(nullable = true)
-    var tvNumber: Int? = null
+    private var tvNumber: Int? = null
 
     @JsonIgnore
     fun getTvNumberProp(): Int? {
@@ -164,7 +164,7 @@ class Car {
     }
 
     @Column(nullable = true)
-    var weight: Int? = null
+    private var weight: Int? = null
 
     @JsonIgnore
     fun getWeightProp(): Int? {
@@ -184,7 +184,7 @@ class Car {
     }
 
     @Column(nullable = true)
-    var height: Int? = null
+    private var height: Int? = null
 
     @JsonIgnore
     fun getHeightProp(): Int? {
@@ -205,7 +205,7 @@ class Car {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = true)
-    var driveType: DriveType? = null
+    private var driveType: DriveType? = null
 
     @JsonIgnore
     fun getDriveTypeProp(): DriveType? {
