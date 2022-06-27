@@ -123,7 +123,7 @@ function CarsPage() {
                 true,
                 0,
                 right,
-                ""
+                null
             )
 
             await axios.post("http://localhost:8080/api/offers", offer)
@@ -145,7 +145,7 @@ function CarsPage() {
                 true,
                 discount,
                 right,
-                ""
+                null
             )
 
             await axios.post("http://localhost:8080/api/offers", offer)
@@ -155,7 +155,7 @@ function CarsPage() {
             .finally(() => {
                 handleClose()
                 navigate('/companies', {replace: true})
-                enqueueSnackbar(`Pomyslnie dodano oferte z rabatem ${discount}%`, {variant: 'success'})
+                enqueueSnackbar(`Pomyslnie wyslano oferte z rabatem ${discount}%`, {variant: 'success'})
             })
             .catch(console.error)
     }

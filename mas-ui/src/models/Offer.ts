@@ -6,9 +6,9 @@ class Offer {
     isAccepted: boolean
     discount: number
     cars: Car[]
-    refusalDescription: string
+    refusalDescription: string | null
 
-    constructor(companyId: number, isAccepted: boolean, discount: number, cars: Car[], refusalDescription: string) {
+    constructor(companyId: number, isAccepted: boolean, discount: number, cars: Car[], refusalDescription: string | null) {
         this.companyId = companyId
         this.isAccepted = isAccepted
         this.discount = discount
