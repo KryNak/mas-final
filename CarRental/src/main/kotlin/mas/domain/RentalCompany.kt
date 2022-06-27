@@ -12,7 +12,7 @@ class RentalCompany(capital: Int) {
 
     val capital: Int = capital
 
-    @OneToMany(mappedBy = "rentalCompany", cascade = [CascadeType.PERSIST, CascadeType.PERSIST])
+    @OneToMany(mappedBy = "rentalCompany", cascade = [CascadeType.PERSIST, CascadeType.PERSIST], fetch = FetchType.EAGER)
     private val cars: MutableSet<Car> = mutableSetOf()
 
     fun addCarUnidirectionally(car: Car){

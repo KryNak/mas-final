@@ -9,6 +9,7 @@ import java.time.temporal.ChronoUnit
 import javax.persistence.*
 import java.time.Duration
 import java.util.concurrent.TimeUnit
+import javax.validation.constraints.Size
 
 @Entity
 @Table(name = "reservations")
@@ -33,7 +34,7 @@ class Reservation(
     @Transient
     var duration: Long = Duration.between(dateFrom.atStartOfDay(), dateTo.atStartOfDay()).toDays()
 
-    @PostLoad()
+    @PostLoad
     private fun setDuration() {
         duration = Duration.between(dateFrom.atStartOfDay(), dateTo.atStartOfDay()).toDays()
     }
@@ -47,6 +48,18 @@ class Reservation(
     @JsonIgnoreProperties("reservations")
     private val cars: MutableSet<Car> = mutableSetOf()
 
+    @OneToMany(mappedBy = "reservation")
+    @Size(max = 3)
+    private val mediations: MutableSet<Mediation> = mutableSetOf()
+
+    fun addMediationUnidirectionally(mediation: Mediation) {
+        mediations.add(mediation)
+    }
+
+    fun addMediationBidirectionally(mediation: Mediation) {
+        mediation.addReservationUnidirectionally(this)
+        mediations.add(mediation)
+    }
 
     fun addCarUnidirectionally(car: Car) {
         cars.add(car)

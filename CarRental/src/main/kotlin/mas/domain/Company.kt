@@ -41,16 +41,17 @@ class Company(
         events.add(event)
     }
 
-    @OneToMany(mappedBy = "company", cascade = [CascadeType.PERSIST, CascadeType.MERGE])
-    private val offers: MutableSet<Offer> = mutableSetOf()
+    @OneToOne(mappedBy = "company", cascade = [CascadeType.PERSIST, CascadeType.MERGE])
+    var offer: Offer? = null
+        private set
 
     fun addOfferUnidirectionally(offer: Offer) {
-        offers.add(offer)
+        this.offer = offer
     }
 
     fun addOfferBidirectionally(offer: Offer) {
         offer.addCompanyUnidirectionally(this)
-        offers.add(offer)
+        this.offer = offer
     }
 
     override fun equals(other: Any?): Boolean {

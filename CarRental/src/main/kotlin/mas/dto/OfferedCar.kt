@@ -1,4 +1,3 @@
 package mas.dto
 
-class OfferedCar {
-}
+data class OfferedCar(val vin: String, val name: String)

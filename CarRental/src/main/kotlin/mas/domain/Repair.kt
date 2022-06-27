@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import mas.utils.Json
 import org.hibernate.Hibernate
+import java.time.LocalDate
+import javax.annotation.PostConstruct
 import javax.persistence.*
 
 @Entity
@@ -26,6 +28,8 @@ class Repair (
     @JoinColumn(name = "vin_fk", referencedColumnName = "vin", nullable = false)
     @JsonIgnoreProperties("repairs")
     private val car: Car = car
+
+    var createdAt: LocalDate = LocalDate.now()
 
     init {
         car.addRepairUnidirectionally(this)

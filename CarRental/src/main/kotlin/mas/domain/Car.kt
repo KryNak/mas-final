@@ -33,7 +33,7 @@ class Car {
         this.name = make
         this.rentalStatus = rentalStatus
         this.mileage = mileage
-        this.price = price
+        this.price = if(price > BigDecimal.ZERO) price else throw IllegalArgumentException("Price should be bigger than 0")
         this.carTypes = carTypes
         this.owningStatus = OwningStatus.OWN
         this.instalmentAmount = BigDecimal.ZERO
@@ -54,13 +54,14 @@ class Car {
         this.name = make
         this.rentalStatus = rentalStatus
         this.mileage = mileage
-        this.price = price
+        this.price = if(price > BigDecimal.ZERO) price else throw IllegalArgumentException("Price should be bigger than 0")
         this.carTypes = carTypes
         this.owningStatus = OwningStatus.LEASING
         this.instalmentAmount = instalmentAmount
     }
 
     @Id
+    @Column(columnDefinition = "text")
     val vin: String
 
     val description: String?
@@ -248,7 +249,7 @@ class Car {
         fetch = FetchType.EAGER
     )
     @JsonIgnoreProperties("car")
-    private val repairs: MutableSet<Repair> = mutableSetOf()
+    private val repairs: MutableSet<Repair> = TreeSet { r1, r2 -> r1.createdAt.compareTo(r2.createdAt)}
 
     fun addRepairUnidirectionally(repair: Repair) {
         repairs.add(repair)
@@ -260,7 +261,7 @@ class Car {
 
     @ManyToMany(mappedBy = "cars", cascade = [CascadeType.PERSIST, CascadeType.MERGE], fetch = FetchType.EAGER)
     @JsonIgnoreProperties("cars")
-    private val reservations: MutableSet<Reservation> = TreeSet { res1, res2 -> res1.dateFrom.compareTo(res2.dateTo) }
+    private val reservations: MutableSet<Reservation> = mutableSetOf()
 
     fun addReservationUnidirectionally(reservation: Reservation) {
         reservations.add(reservation)
@@ -271,7 +272,7 @@ class Car {
         reservations.add(reservation)
     }
 
-    @ManyToOne(cascade = [CascadeType.PERSIST, CascadeType.MERGE])
+    @ManyToOne(cascade = [CascadeType.PERSIST, CascadeType.MERGE], fetch = FetchType.EAGER)
     @JoinColumn(name = "fk_rental_company", referencedColumnName = "id", nullable = false)
     private lateinit var rentalCompany: RentalCompany
 
@@ -303,5 +304,19 @@ class Car {
         return Json.stringify(this)
     }
 
+    companion object{
+
+        fun evaluatePrice(car: Car): BigDecimal {
+            return (car.price - BigDecimal(car.mileage)) + with(car.carTypes) {
+                when {
+                    contains(CarType.LUXURY) -> BigDecimal(500_00)
+                    contains(CarType.SPORT) -> BigDecimal(200_000)
+                    contains(CarType.OFF_ROAD) -> BigDecimal(100_000)
+                    else -> BigDecimal.ZERO
+                }
+            }
+        }
+
+    }
 
 }

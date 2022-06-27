@@ -1,9 +1,4 @@
-import com.github.javafaker.Faker
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import java.util.*
-import kotlin.collections.*
 
 plugins {
     id("org.springframework.boot") version "2.7.0"
@@ -30,6 +25,7 @@ dependencies {
     implementation("org.flywaydb:flyway-core")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
     runtimeOnly("org.postgresql:postgresql")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
@@ -65,47 +61,4 @@ flyway {
 
 tasks.withType<Test> {
     useJUnitPlatform()
-}
-
-tasks.register("seedDb__V2") {
-
-    doLast {
-
-        var text = ""
-
-        val file = File("./src/main/resources/db/migration/V2__seed-data.sql")
-        file.createNewFile()
-
-        repeat(100) {
-
-            val request = Request.Builder()
-                .url("https://loremflickr.com/640/480/business")
-                .get()
-                .build()
-
-            val faker = Faker(Locale.ENGLISH)
-
-            val companyId = UUID.randomUUID()
-            val companyName = faker.company().name()
-            val companyPhoneNumber = faker.phoneNumber().phoneNumber()
-            val companyDescription = faker.lorem().words(50).joinToString(separator = " ", postfix = ".")
-            val companyImage = OkHttpClient().newCall(request).execute().request.url.toString()
-            val companyRelations = (0..100).random()
-
-            val line = arrayListOf<String>(
-                companyId.toString(),
-                companyName,
-                companyPhoneNumber,
-                companyDescription,
-                companyImage
-            ).joinToString(separator = ", ", prefix = "INSERT INTO company VALUES(") {
-                "'${it.replace("'", "''")}'"
-            }.plus(", ${companyRelations});")
-
-
-            text += "$line\n"
-        }
-
-        file.writeText(text)
-    }
 }

@@ -15,8 +15,8 @@ class CompanyController(
 ) {
 
     @GetMapping()
-    fun getCompanies(): ResponseEntity<List<Company>> {
-        return ResponseEntity.ok(companyRepository.findAll())
+    fun getCompaniesWithActiveOffer(): ResponseEntity<List<Company>> {
+        return ResponseEntity.ok(companyRepository.findAll().filter { (it.offer?.isConsidered?.not()) ?: false })
     }
 
     @GetMapping(path = ["/{id}"])
